@@ -23,10 +23,16 @@ pub enum Error {
     RedisError(#[from] redis::RedisError),
 
     #[error(transparent)]
+    DB(#[from] sea_orm::DbErr),
+
+    #[error(transparent)]
     RedisPoolError(#[from] redis_pool::errors::RedisPoolError),
 
     #[error(transparent)]
     SessionError(#[from] axum_session::SessionError),
+
+    #[error(transparent)]
+    Tera(#[from] tera::Error),
 
     #[error(transparent)]
     Any(#[from] Box<dyn std::error::Error + Send + Sync>),

@@ -11,7 +11,6 @@ clap = { version = "4", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 dotenvy = { version = "0.15" }
 async-trait = "0.1"
-once_cell = "1"
 thiserror = "2"
 eyre = "0.6"
 tracing = "0.1"
@@ -26,3 +25,20 @@ axum_session = "0.14"
 axum_session_redispool = { version = "0.3", features = ["redis-clusterdb"] }
 colored = "2"
 backtrace_printer = "1"
+tera = "1"
+daemonize = "0.5.0"
+sea-orm = { version = "1", features = ["sqlx-all", "runtime-tokio-rustls", "with-uuid", "with-chrono", "with-json", "with-bigdecimal", "sea-orm-internal"] }
+tower = { version = "0.5" }
+tower-http = { version = "0.6", features = [
+    "trace",
+    "catch-panic",
+    "timeout",
+    "add-extension",
+    "cors",
+    "fs",
+    "set-header",
+    "compression-full",
+] }
+http = "1"
+thousands = "0.2"
+byte-unit = "4"

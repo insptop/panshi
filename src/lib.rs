@@ -1,3 +1,7 @@
 pub mod http;
-mod error;
-mod component;
+pub mod error;
+pub mod component;
+pub mod config;
+mod logger;
+mod app;
+mod view;

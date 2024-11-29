@@ -5,7 +5,7 @@ use serde::de::DeserializeOwned;
 
 pub mod redis;
 pub mod session;
-
+mod database;
 
 pub struct ComponentRegister {
     config: Config,
