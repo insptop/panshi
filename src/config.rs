@@ -1,11 +1,11 @@
+use config::{Config as Cfg, File, FileFormat};
+use serde::Deserialize;
+use std::sync::LazyLock;
 use std::{
     env, fs,
     path::{Path, PathBuf},
     str::FromStr,
 };
-use std::sync::LazyLock;
-use config::{Config as Cfg, File, FileFormat};
-use serde::Deserialize;
 use tera::{Context, Tera};
 
 use crate::error::{Error, Result};
@@ -13,6 +13,8 @@ use crate::error::{Error, Result};
 static DEFAULT_FOLDER: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("config"));
 pub const DEFAULT_ENVIRONMENT: &str = "development";
 pub const INSPIRER_ENV: &str = "INSPIRER_ENV";
+pub const INSPIRER_APP_NAME: &str = "INSPIRER_APP_NAME";
+pub const INSPIRER_CONFIG_FOLDER: &str = "INSPIRER_CONFIG_FOLDER";
 
 pub(crate) mod config_keys {
     pub const LOG: &'static str = "log";
@@ -25,6 +27,20 @@ pub enum Environment {
     Development,
     Test,
     Any(String),
+}
+
+impl Environment {
+    pub fn load_config(&self) -> Result<Config> {
+        let path = env::var(INSPIRER_CONFIG_FOLDER).ok().map(PathBuf::from);
+
+        env::var(INSPIRER_APP_NAME).ok().map_or(
+            ConfigLoader::default().load_folder_opt(self, path.as_ref().map(|p| p.as_path())),
+            |name| {
+                ConfigLoader::with_name(&name)
+                    .load_folder_opt(self, path.as_ref().map(|p| p.as_path()))
+            },
+        )
+    }
 }
 
 impl std::fmt::Display for Environment {
@@ -61,6 +77,10 @@ pub fn resolve_from_env() -> String {
     std::env::var(INSPIRER_ENV).unwrap_or_else(|_| DEFAULT_ENVIRONMENT.to_string())
 }
 
+pub fn resolve_dotenv_file() -> Option<PathBuf> {
+    dotenvy::dotenv().ok()
+}
+
 #[derive(Clone)]
 pub struct Config {
     config: Cfg,
@@ -73,12 +93,12 @@ impl Config {
 }
 
 #[derive(Default)]
-pub struct ConfigLoader {
-    name: Option<&'static str>,
+pub struct ConfigLoader<'s> {
+    name: Option<&'s str>,
 }
 
-impl ConfigLoader {
-    pub fn with_name(name: &'static str) -> Self {
+impl<'s> ConfigLoader<'s> {
+    pub fn with_name(name: &'s str) -> Self {
         ConfigLoader { name: Some(name) }
     }
 

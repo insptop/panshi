@@ -5,3 +5,4 @@ pub mod config;
 mod logger;
 mod app;
 mod view;
+mod cli;
